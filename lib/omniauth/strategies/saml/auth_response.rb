@@ -30,7 +30,8 @@ module OmniAuth
         def name_id
           @name_id ||= begin
             node = xpath("/p:Response/a:Assertion[@ID='#{signed_element_id}']/a:Subject/a:NameID")
-            node ||=  xpath("/p:Response[@ID='#{signed_element_id}']/a:Assertion/a:Subject/a:NameID")
+            node ||= xpath("/p:Response[@ID='#{signed_element_id}']/a:Assertion/a:Subject/a:NameID")
+            node ||= xpath("/p:Response/a:Assertion/a:Subject/a:NameID")
             node.nil? ? nil : strip(node.text)
           end
         end
@@ -76,7 +77,7 @@ module OmniAuth
         def validate(soft = true)
           validate_response_state(soft) &&
           validate_conditions(soft)     &&
-          document.validate(get_fingerprint, soft)
+          document.validate(get_fingerprint, settings, soft, get_cert)
         end
 
         def validate_response_state(soft = true)
@@ -105,6 +106,10 @@ module OmniAuth
           else
             settings.idp_cert_fingerprint
           end
+        end
+
+        def get_cert
+          settings.idp_cert
         end
 
         def validate_conditions(soft = true)

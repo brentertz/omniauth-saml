@@ -95,7 +95,8 @@ shared_examples_for 'a validating method' do |soft|
 
   context "when the SAML document is valid" do
     before :each do
-      subject.document.should_receive(:validate).with('FINGERPRINT', soft).and_return(true)
+      subject.settings = mock(Object, :idp_cert_fingerprint => 'FINGERPRINT', :idp_cert => nil)
+      subject.document.should_receive(:validate).with('FINGERPRINT', subject.settings, soft, nil).and_return(true)
       subject.options[:skip_conditions] = true
     end
 
@@ -111,7 +112,7 @@ shared_examples_for 'a validating method' do |soft|
 
     before :each do
       subject.settings.stub(:idp_cert).and_return(cert)
-      subject.document.should_receive(:validate).with(expected, soft).and_return(true)
+      subject.document.should_receive(:validate).with(expected, subject.settings, soft, cert).and_return(true)
       subject.options[:skip_conditions] = true
     end
 
